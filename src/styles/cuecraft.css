@@ -305,6 +305,24 @@
   font-weight: 700;
 }
 
+.search-field > span {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.search-field kbd {
+  min-width: 1.35rem;
+  padding: 0.12rem 0.3rem;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  color: var(--ink);
+  font-size: 0.65rem;
+  text-align: center;
+  background: var(--surface-raised);
+  box-shadow: 0 2px 0 #090e0b;
+}
+
 .search-field input {
   width: 100%;
   border: 1px solid var(--line);

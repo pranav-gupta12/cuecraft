@@ -1,4 +1,5 @@
 import { cueStates, departments, type CueState, type Department } from '../domain/show';
+import { useSearchShortcut } from '../hooks/useSearchShortcut';
 import type { WorkspaceFilters } from '../state/workspace';
 
 const departmentLabels: Record<Department, string> = {
@@ -34,6 +35,7 @@ export function FilterPanel({
   onStateToggle,
   onClear,
 }: FilterPanelProps) {
+  const searchRef = useSearchShortcut({ query: filters.query, onQueryChange });
   const hasFilters =
     filters.query.length > 0 ||
     filters.departments.length > 0 ||
@@ -51,9 +53,14 @@ export function FilterPanel({
       </div>
 
       <label className="search-field">
-        <span>Search run of show</span>
+        <span>
+          Search run of show
+          <kbd aria-label="Keyboard shortcut: slash">/</kbd>
+        </span>
         <input
+          ref={searchRef}
           type="search"
+          aria-keyshortcuts="/"
           value={filters.query}
           onChange={(event) => onQueryChange(event.currentTarget.value)}
           placeholder="Cue, owner, trigger…"
