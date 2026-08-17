@@ -1,4 +1,5 @@
 import { useMemo, useReducer } from 'react';
+import { ConflictSummary } from './components/ConflictSummary';
 import { CueInspector } from './components/CueInspector';
 import { CueTimeline } from './components/CueTimeline';
 import { FilterPanel } from './components/FilterPanel';
@@ -8,6 +9,7 @@ import { showPlan } from './data/showPlan';
 import { useInitialCues, usePersistCueStates } from './hooks/usePersistedCueStates';
 import { emptyFilters, workspaceReducer } from './state/workspace';
 import { filterCues } from './utils/filterCues';
+import { buildConflictReview } from './utils/conflictReview';
 import './styles/cuecraft.css';
 
 export function App() {
@@ -21,6 +23,7 @@ export function App() {
     () => filterCues(workspace.cues, workspace.filters),
     [workspace.cues, workspace.filters],
   );
+  const conflictReview = useMemo(() => buildConflictReview(workspace.cues), [workspace.cues]);
   const selectedCue = workspace.cues.find((cue) => cue.id === workspace.selectedCueId) ?? null;
   usePersistCueStates(workspace.cues);
 
@@ -28,6 +31,11 @@ export function App() {
     <main id="main-content">
       <ShowHeader show={showPlan} />
       <ReadinessSummary cues={workspace.cues} />
+      <ConflictSummary
+        review={conflictReview}
+        reviewing={workspace.filters.conflictsOnly}
+        onToggleReview={() => dispatch({ type: 'toggle-conflicts' })}
+      />
       <div className="workspace">
         <FilterPanel
           filters={workspace.filters}

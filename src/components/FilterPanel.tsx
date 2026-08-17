@@ -35,7 +35,10 @@ export function FilterPanel({
   onClear,
 }: FilterPanelProps) {
   const hasFilters =
-    filters.query.length > 0 || filters.departments.length > 0 || filters.states.length > 0;
+    filters.query.length > 0 ||
+    filters.departments.length > 0 ||
+    filters.states.length > 0 ||
+    filters.conflictsOnly;
 
   return (
     <aside className="filters" aria-labelledby="filter-title">
@@ -95,4 +98,3 @@ export function FilterPanel({
     </aside>
   );
 }
-
