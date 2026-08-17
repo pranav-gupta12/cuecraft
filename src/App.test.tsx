@@ -14,7 +14,9 @@ describe('Cuecraft workspace', () => {
     expect(screen.getByRole('heading', { name: 'Nocturne / Opening Night' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Run of show' })).toBeInTheDocument();
     expect(screen.getByText('3 of 8 cues cleared')).toBeInTheDocument();
-    expect(screen.getAllByRole('button', { pressed: false })).toHaveLength(8);
+    expect(
+      within(screen.getByRole('region', { name: 'Run of show' })).getAllByRole('button', { pressed: false }),
+    ).toHaveLength(8);
   });
 
   it('filters cues and restores the full list', async () => {
@@ -51,5 +53,21 @@ describe('Cuecraft workspace', () => {
     await user.type(screen.getByRole('searchbox', { name: 'Search run of show' }), 'not a real cue');
     expect(screen.getByRole('heading', { name: 'No cues match' })).toBeInTheDocument();
     expect(screen.getByRole('status')).toHaveTextContent('Showing 0 of 8 cues');
+  });
+
+  it('isolates timing conflicts and restores the complete run', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    expect(screen.getByRole('heading', { name: '1 timing collision' })).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Review conflicts' }));
+
+    expect(screen.getByRole('status')).toHaveTextContent('Showing 2 of 8 cues');
+    expect(screen.getByRole('button', { name: /LX 01 House to half/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /LX 03 Preset reveal/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /SD 02 Foyer bed out/i })).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Show complete run' }));
+    expect(screen.getByRole('status')).toHaveTextContent('Showing 8 of 8 cues');
   });
 });
