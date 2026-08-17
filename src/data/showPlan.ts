@@ -35,7 +35,7 @@ export const showPlan: ShowPlan = {
       code: 'LX 03',
       title: 'Preset reveal',
       department: 'lighting',
-      offsetSeconds: 12,
+      offsetSeconds: 10,
       durationSeconds: 10,
       state: 'review',
       owner: 'Mara Chen',
