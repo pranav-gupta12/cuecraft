@@ -55,7 +55,7 @@ export function FilterPanel({
       <label className="search-field">
         <span>
           Search run of show
-          <kbd aria-label="Keyboard shortcut: slash">/</kbd>
+          <kbd aria-hidden="true" title="Press slash to focus search">/</kbd>
         </span>
         <input
           ref={searchRef}
