@@ -70,4 +70,20 @@ describe('Cuecraft workspace', () => {
     await user.click(screen.getByRole('button', { name: 'Show complete run' }));
     expect(screen.getByRole('status')).toHaveTextContent('Showing 8 of 8 cues');
   });
+
+  it('announces and undoes the latest readiness update', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByRole('button', { name: /SD 06 Opening chord/i }));
+    const inspector = screen.getByRole('complementary', { name: /opening chord/i });
+    await user.click(within(inspector).getByRole('radio', { name: 'Ready' }));
+
+    const notice = screen.getByText('Readiness changed to Ready.').closest('.change-notice');
+    expect(notice).toHaveTextContent('Opening chordReadiness changed to Ready.');
+    await user.click(within(notice as HTMLElement).getByRole('button', { name: 'Undo' }));
+
+    expect(within(inspector).getByRole('radio', { name: 'Draft' })).toBeChecked();
+    expect(screen.getByText('3 of 8 cues cleared')).toBeInTheDocument();
+  });
 });

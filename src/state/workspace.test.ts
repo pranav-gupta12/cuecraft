@@ -50,4 +50,31 @@ describe('workspaceReducer', () => {
     expect(cleared.filters).toEqual(emptyFilters);
     expect(cleared.selectedCueId).toBe('camera-two');
   });
+
+  it('restores the previous value when the latest readiness change is undone', () => {
+    const changed = workspaceReducer(initialState, {
+      type: 'set-cue-state',
+      cueId: 'opening-chord',
+      state: 'ready',
+    });
+    const restored = workspaceReducer(changed, { type: 'undo-cue-state' });
+
+    expect(changed.lastStateChange).toEqual({
+      cueId: 'opening-chord',
+      previousState: 'draft',
+      nextState: 'ready',
+    });
+    expect(restored.cues.find((cue) => cue.id === 'opening-chord')?.state).toBe('draft');
+    expect(restored.lastStateChange).toBeNull();
+  });
+
+  it('does not record a change when the readiness value stays the same', () => {
+    const unchanged = workspaceReducer(initialState, {
+      type: 'set-cue-state',
+      cueId: 'house-to-half',
+      state: 'ready',
+    });
+
+    expect(unchanged).toBe(initialState);
+  });
 });
