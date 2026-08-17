@@ -11,6 +11,11 @@ export type WorkspaceState = {
   cues: Cue[];
   selectedCueId: string | null;
   filters: WorkspaceFilters;
+  lastStateChange: {
+    cueId: string;
+    previousState: CueState;
+    nextState: CueState;
+  } | null;
 };
 
 export type WorkspaceAction =
@@ -20,6 +25,8 @@ export type WorkspaceAction =
   | { type: 'toggle-state'; state: CueState }
   | { type: 'toggle-conflicts' }
   | { type: 'set-cue-state'; cueId: string; state: CueState }
+  | { type: 'undo-cue-state' }
+  | { type: 'dismiss-change' }
   | { type: 'clear-filters' };
 
 export const emptyFilters: WorkspaceFilters = {
@@ -61,10 +68,35 @@ export function workspaceReducer(state: WorkspaceState, action: WorkspaceAction)
         filters: { ...state.filters, conflictsOnly: !state.filters.conflictsOnly },
       };
     case 'set-cue-state':
+      {
+        const cue = state.cues.find((candidate) => candidate.id === action.cueId);
+        if (!cue || cue.state === action.state) return state;
+
+        return {
+          ...state,
+          cues: state.cues.map((candidate) =>
+            candidate.id === action.cueId ? { ...candidate, state: action.state } : candidate,
+          ),
+          lastStateChange: {
+            cueId: action.cueId,
+            previousState: cue.state,
+            nextState: action.state,
+          },
+        };
+      }
+    case 'undo-cue-state':
+      if (!state.lastStateChange) return state;
       return {
         ...state,
-        cues: state.cues.map((cue) => (cue.id === action.cueId ? { ...cue, state: action.state } : cue)),
+        cues: state.cues.map((cue) =>
+          cue.id === state.lastStateChange?.cueId
+            ? { ...cue, state: state.lastStateChange.previousState }
+            : cue,
+        ),
+        lastStateChange: null,
       };
+    case 'dismiss-change':
+      return { ...state, lastStateChange: null };
     case 'clear-filters':
       return { ...state, filters: emptyFilters };
   }

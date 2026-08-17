@@ -18,6 +18,7 @@ export function App() {
     cues: initialCues,
     selectedCueId: null,
     filters: emptyFilters,
+    lastStateChange: null,
   });
   const visibleCues = useMemo(
     () => filterCues(workspace.cues, workspace.filters),

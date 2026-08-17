@@ -6,6 +6,7 @@ const initialState: WorkspaceState = {
   cues: showPlan.cues,
   selectedCueId: null,
   filters: emptyFilters,
+  lastStateChange: null,
 };
 
 describe('workspaceReducer', () => {
