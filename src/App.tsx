@@ -1,5 +1,6 @@
 import { useMemo, useReducer } from 'react';
 import { ConflictSummary } from './components/ConflictSummary';
+import { ChangeNotice } from './components/ChangeNotice';
 import { CueInspector } from './components/CueInspector';
 import { CueTimeline } from './components/CueTimeline';
 import { FilterPanel } from './components/FilterPanel';
@@ -26,6 +27,9 @@ export function App() {
   );
   const conflictReview = useMemo(() => buildConflictReview(workspace.cues), [workspace.cues]);
   const selectedCue = workspace.cues.find((cue) => cue.id === workspace.selectedCueId) ?? null;
+  const changedCue = workspace.lastStateChange
+    ? workspace.cues.find((cue) => cue.id === workspace.lastStateChange?.cueId) ?? null
+    : null;
   usePersistCueStates(workspace.cues);
 
   return (
@@ -58,6 +62,14 @@ export function App() {
           onStateChange={(cueId, state) => dispatch({ type: 'set-cue-state', cueId, state })}
         />
       </div>
+      {workspace.lastStateChange && changedCue ? (
+        <ChangeNotice
+          cueTitle={changedCue.title}
+          nextState={workspace.lastStateChange.nextState}
+          onUndo={() => dispatch({ type: 'undo-cue-state' })}
+          onDismiss={() => dispatch({ type: 'dismiss-change' })}
+        />
+      ) : null}
     </main>
   );
 }
