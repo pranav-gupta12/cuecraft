@@ -5,13 +5,15 @@ import { FilterPanel } from './components/FilterPanel';
 import { ReadinessSummary } from './components/ReadinessSummary';
 import { ShowHeader } from './components/ShowHeader';
 import { showPlan } from './data/showPlan';
+import { useInitialCues, usePersistCueStates } from './hooks/usePersistedCueStates';
 import { emptyFilters, workspaceReducer } from './state/workspace';
 import { filterCues } from './utils/filterCues';
 import './styles/cuecraft.css';
 
 export function App() {
+  const initialCues = useInitialCues(showPlan.cues);
   const [workspace, dispatch] = useReducer(workspaceReducer, {
-    cues: showPlan.cues,
+    cues: initialCues,
     selectedCueId: null,
     filters: emptyFilters,
   });
@@ -20,6 +22,7 @@ export function App() {
     [workspace.cues, workspace.filters],
   );
   const selectedCue = workspace.cues.find((cue) => cue.id === workspace.selectedCueId) ?? null;
+  usePersistCueStates(workspace.cues);
 
   return (
     <main id="main-content">
