@@ -25,6 +25,7 @@ describe('filterCues', () => {
       query: 'rise',
       departments: ['lighting'],
       states: ['draft'],
+      conflictsOnly: false,
     });
 
     expect(result.map((cue) => cue.id)).toEqual(['special-rise']);
@@ -35,6 +36,7 @@ describe('filterCues', () => {
       query: '',
       departments: ['audio', 'video'],
       states: [],
+      conflictsOnly: false,
     });
 
     expect(result.every((cue) => cue.department === 'audio' || cue.department === 'video')).toBe(true);

@@ -4,6 +4,7 @@ export type WorkspaceFilters = {
   query: string;
   departments: Department[];
   states: CueState[];
+  conflictsOnly: boolean;
 };
 
 export type WorkspaceState = {
@@ -17,6 +18,7 @@ export type WorkspaceAction =
   | { type: 'set-query'; query: string }
   | { type: 'toggle-department'; department: Department }
   | { type: 'toggle-state'; state: CueState }
+  | { type: 'toggle-conflicts' }
   | { type: 'set-cue-state'; cueId: string; state: CueState }
   | { type: 'clear-filters' };
 
@@ -24,6 +26,7 @@ export const emptyFilters: WorkspaceFilters = {
   query: '',
   departments: [],
   states: [],
+  conflictsOnly: false,
 };
 
 function toggleValue<Value>(values: Value[], value: Value): Value[] {
@@ -52,6 +55,11 @@ export function workspaceReducer(state: WorkspaceState, action: WorkspaceAction)
           states: toggleValue(state.filters.states, action.state),
         },
       };
+    case 'toggle-conflicts':
+      return {
+        ...state,
+        filters: { ...state.filters, conflictsOnly: !state.filters.conflictsOnly },
+      };
     case 'set-cue-state':
       return {
         ...state,
@@ -61,4 +69,3 @@ export function workspaceReducer(state: WorkspaceState, action: WorkspaceAction)
       return { ...state, filters: emptyFilters };
   }
 }
-
