@@ -86,4 +86,23 @@ describe('Cuecraft workspace', () => {
     expect(within(inspector).getByRole('radio', { name: 'Draft' })).toBeChecked();
     expect(screen.getByText('3 of 8 cues cleared')).toBeInTheDocument();
   });
+
+  it('focuses, clears, and releases search without hijacking typed slash characters', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    const search = screen.getByRole('searchbox', { name: /search run of show/i });
+
+    await user.keyboard('/');
+    expect(search).toHaveFocus();
+
+    await user.keyboard('audio/video');
+    expect(search).toHaveValue('audio/video');
+
+    await user.keyboard('{Escape}');
+    expect(search).toHaveValue('');
+    expect(search).toHaveFocus();
+
+    await user.keyboard('{Escape}');
+    expect(search).not.toHaveFocus();
+  });
 });
