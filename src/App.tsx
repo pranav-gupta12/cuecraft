@@ -1,9 +1,51 @@
+import { useMemo, useReducer } from 'react';
+import { CueInspector } from './components/CueInspector';
+import { CueTimeline } from './components/CueTimeline';
+import { FilterPanel } from './components/FilterPanel';
+import { ReadinessSummary } from './components/ReadinessSummary';
+import { ShowHeader } from './components/ShowHeader';
+import { showPlan } from './data/showPlan';
+import { emptyFilters, workspaceReducer } from './state/workspace';
+import { filterCues } from './utils/filterCues';
+import './styles/cuecraft.css';
+
 export function App() {
+  const [workspace, dispatch] = useReducer(workspaceReducer, {
+    cues: showPlan.cues,
+    selectedCueId: null,
+    filters: emptyFilters,
+  });
+  const visibleCues = useMemo(
+    () => filterCues(workspace.cues, workspace.filters),
+    [workspace.cues, workspace.filters],
+  );
+  const selectedCue = workspace.cues.find((cue) => cue.id === workspace.selectedCueId) ?? null;
+
   return (
-    <main>
-      <h1>Cuecraft</h1>
-      <p>Shape the show before the room goes dark.</p>
+    <main id="main-content">
+      <ShowHeader show={showPlan} />
+      <ReadinessSummary cues={workspace.cues} />
+      <div className="workspace">
+        <FilterPanel
+          filters={workspace.filters}
+          resultCount={visibleCues.length}
+          totalCount={workspace.cues.length}
+          onQueryChange={(query) => dispatch({ type: 'set-query', query })}
+          onDepartmentToggle={(department) => dispatch({ type: 'toggle-department', department })}
+          onStateToggle={(state) => dispatch({ type: 'toggle-state', state })}
+          onClear={() => dispatch({ type: 'clear-filters' })}
+        />
+        <CueTimeline
+          cues={visibleCues}
+          selectedCueId={workspace.selectedCueId}
+          onSelectCue={(cueId) => dispatch({ type: 'select-cue', cueId })}
+        />
+        <CueInspector
+          cue={selectedCue}
+          onClose={() => dispatch({ type: 'select-cue', cueId: null })}
+          onStateChange={(cueId, state) => dispatch({ type: 'set-cue-state', cueId, state })}
+        />
+      </div>
     </main>
   );
 }
-
